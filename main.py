@@ -1,4 +1,4 @@
-# streamlit_steam_player_dashboard.py
+# streamlit_valve_player_app_cyberpunk.py
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
-st.set_page_config(page_title="Steam Player Dashboard", page_icon="🎮", layout="wide")
+st.set_page_config(page_title="Valve Player Dashboard", page_icon="🎮", layout="wide")
 
 # --- Cyberpunk Neon CSS 강화 ---
 st.markdown("""
@@ -74,7 +74,7 @@ uploaded_file = st.sidebar.file_uploader("📁 CSV 업로드", type=["csv"])
 @st.cache_data
 def load_default_data():
     try:
-        return pd.read_csv('Steam_Player_Data.csv')  # 파일명도 Steam으로
+        return pd.read_csv('Valve_Player_Data.csv')
     except FileNotFoundError:
         return pd.DataFrame()
 
@@ -97,7 +97,7 @@ selected_numeric = st.sidebar.multiselect("분석할 숫자형 컬럼 선택", n
 selected_cat = st.sidebar.selectbox("PCA 색상 기준 범주형 컬럼 선택", [None] + cat_cols)
 
 # --- 헤더 ---
-st.markdown('<div class="main-title">🎮 Steam Player Dashboard</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">🎮 Valve Player Dashboard</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtext">Cyberpunk Neon Ultimate — Upload & Explore ⚡</div>', unsafe_allow_html=True)
 
 # --- 탭 ---
@@ -171,9 +171,7 @@ with tabs[3]:
     @st.cache_data
     def convert_df_to_csv(d): return d.to_csv(index=False).encode('utf-8')
     csv = convert_df_to_csv(df)
-    st.download_button("💾 CSV 다운로드", data=csv, file_name='steam_player_data.csv', mime='text/csv')
+    st.download_button("💾 CSV 다운로드", data=csv, file_name='valve_player_data.csv', mime='text/csv')
 
 # --- Footer ---
-st.markdown('<div
-
-        
+st.markdown('<div class="footer">Made with 💜 Streamlit + Plotly | Cyberpunk Neon Ultimate | 2025</div>', unsafe_allow_html=True)
