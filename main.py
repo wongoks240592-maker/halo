@@ -12,7 +12,7 @@ from sklearn.preprocessing import StandardScaler
 
 # --- 페이지 기본 설정 ---
 st.set_page_config(
-    page_title="Valve Player Dashboard",  # 브라우저 탭 제목
+    page_title="Steam Player Dashboard",  # 브라우저 탭 제목
     page_icon="🎮",                      # 탭 아이콘
     layout="wide",                        # 넓은 레이아웃
 )
