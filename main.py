@@ -1,4 +1,4 @@
-# streamlit_valve_player_app_cyberpunk.py
+# streamlit_steam_dashboard_inline.py
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -7,12 +7,12 @@ import plotly.graph_objects as go
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
-st.set_page_config(page_title="Valve Player Dashboard", page_icon="🎮", layout="wide")
+st.set_page_config(page_title="Steam Player Dashboard", page_icon="🎮", layout="wide")
 
 # --- Cyberpunk Neon CSS 강화 ---
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap'); /* 미래지향적 폰트 */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 html, body, [class*="st-"] {
     font-family: 'Orbitron', sans-serif;
     color: #e0eaff;
@@ -68,37 +68,26 @@ html, body, [class*="st-"] {
 </style>
 """, unsafe_allow_html=True)
 
-# --- 파일 업로드 ---
-uploaded_file = st.sidebar.file_uploader("📁 CSV 업로드", type=["csv"])
-
-@st.cache_data
-def load_default_data():
-    try:
-        return pd.read_csv('Valve_Player_Data.csv')
-    except FileNotFoundError:
-        return pd.DataFrame()
-
-if uploaded_file:
-    df = pd.read_csv(uploaded_file)
-    st.sidebar.success("✅ 업로드된 CSV 사용")
-else:
-    df = load_default_data()
-    if df.empty:
-        st.error("⚠️ 데이터가 없습니다. CSV 파일을 업로드해주세요.")
-        st.stop()
-    st.sidebar.info("📂 로컬 CSV 사용")
+# --- 샘플 데이터 내장 ---
+df = pd.DataFrame({
+    "player_id": [f"P{i:03d}" for i in range(1,21)],
+    "score": np.random.randint(100,1000,20),
+    "hours_played": np.random.randint(5,100,20),
+    "level": np.random.randint(1,50,20),
+    "region": np.random.choice(["NA","EU","ASIA"],20)
+})
 
 numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
 cat_cols = df.select_dtypes(include=['object']).columns.tolist()
 
 # --- 사이드바 필터 ---
 st.sidebar.markdown("### ⚡ 필터 & 옵션")
-selected_numeric = st.sidebar.multiselect("분석할 숫자형 컬럼 선택", numeric_cols, default=numeric_cols[:5])
+selected_numeric = st.sidebar.multiselect("분석할 숫자형 컬럼 선택", numeric_cols, default=numeric_cols[:3])
 selected_cat = st.sidebar.selectbox("PCA 색상 기준 범주형 컬럼 선택", [None] + cat_cols)
 
 # --- 헤더 ---
-st.markdown('<div class="main-title">🎮 Valve Player Dashboard</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtext">Cyberpunk Neon Ultimate — Upload & Explore ⚡</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">🎮 Steam Player Dashboard</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtext">Cyberpunk Neon Ultimate — 바로 탐색 ⚡</div>', unsafe_allow_html=True)
 
 # --- 탭 ---
 tabs = st.tabs(["🏠 Overview", "📊 Visuals", "🔍 Analysis", "📥 Download"])
@@ -112,10 +101,9 @@ with tabs[0]:
     col2.markdown(f'<div class="metric-card"><h3>열 개수</h3><h2>{n_cols}</h2></div>', unsafe_allow_html=True)
     col3.markdown(f'<div class="metric-card"><h3>숫자형 컬럼</h3><h2>{len(numeric_cols)}</h2></div>', unsafe_allow_html=True)
 
-    if 'score' in df.columns:
-        st.markdown("---")
-        st.markdown("#### 🏆 상위 10 플레이어 (score 기준)")
-        st.dataframe(df.sort_values('score', ascending=False).head(10))
+    st.markdown("---")
+    st.markdown("#### 🏆 상위 10 플레이어 (score 기준)")
+    st.dataframe(df.sort_values('score', ascending=False).head(10))
 
 # --- Visuals 탭 ---
 with tabs[1]:
@@ -169,9 +157,13 @@ with tabs[2]:
 with tabs[3]:
     st.markdown("### 📥 다운로드")
     @st.cache_data
-    def convert_df_to_csv(d): return d.to_csv(index=False).encode('utf-8')
+    def convert_df_to_csv(d): 
+        return d.to_csv(index=False).encode('utf-8')
     csv = convert_df_to_csv(df)
-    st.download_button("💾 CSV 다운로드", data=csv, file_name='valve_player_data.csv', mime='text/csv')
+    st.download_button("💾 CSV 다운로드", data=csv, file_name='steam_player_data.csv', mime='text/csv')
+
+# --- Footer ---
+st.markdown('<div class="footer">Made with 💜 Streamlit + Plotly | Cyberpunk Neon Ultimate | 2025</div>', unsafe_allow_html=True)
 
 # --- Footer ---
 st.markdown('<div class="footer">Made with 💜 Streamlit + Plotly | Cyberpunk Neon Ultimate | 2025</div>', unsafe_allow_html=True)
