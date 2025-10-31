@@ -1,4 +1,4 @@
-# streamlit_valve_player_app_enhanced.py
+# streamlit_valve_player_app_cyberpunk.py
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -9,23 +9,24 @@ from sklearn.preprocessing import StandardScaler
 
 st.set_page_config(page_title="Valve Player Dashboard", page_icon="🎮", layout="wide")
 
-# --- Cyberpunk Neon CSS ---
+# --- Cyberpunk Neon CSS 강화 ---
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap'); /* 미래지향적 폰트 */
 html, body, [class*="st-"] {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     color: #e0eaff;
-    background: radial-gradient(circle at top left, #0f0f1e 0%, #000010 100%);
+    background: linear-gradient(120deg, #0f0f1e 0%, #000010 50%, #1a0f2f 100%);
 }
 .main-title {
-    font-size: 2.5rem !important;
+    font-size: 3rem !important;
     font-weight: 700 !important;
-    background: linear-gradient(90deg, #00e5ff, #ff00ff);
+    background: linear-gradient(90deg, #00ffff, #ff00ff, #ff0077);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-align: center;
-    margin-bottom: 0.5em;
+    margin-bottom: 0.3em;
+    text-shadow: 0 0 15px #00ffff, 0 0 20px #ff00ff;
 }
 .subtext {
     text-align: center;
@@ -34,15 +35,29 @@ html, body, [class*="st-"] {
 }
 .metric-card {
     background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(0,255,255,0.2);
+    border: 1px solid rgba(0,255,255,0.4);
     border-radius: 15px;
     padding: 1.5em;
     text-align: center;
     transition: 0.3s;
+    box-shadow: 0 0 10px #00ffff, 0 0 20px #ff00ff;
 }
 .metric-card:hover {
-    background: rgba(0,255,255,0.1);
-    transform: scale(1.02);
+    background: rgba(0,255,255,0.15);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff, 0 0 60px #ff0077;
+}
+.stButton>button {
+    background: linear-gradient(90deg, #00ffff, #ff00ff);
+    color: #000;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 0.5em 1em;
+    box-shadow: 0 0 10px #00ffff, 0 0 15px #ff00ff;
+}
+.stButton>button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #00ffff, 0 0 25px #ff00ff;
 }
 .footer {
     text-align: center;
@@ -83,7 +98,7 @@ selected_cat = st.sidebar.selectbox("PCA 색상 기준 범주형 컬럼 선택",
 
 # --- 헤더 ---
 st.markdown('<div class="main-title">🎮 Valve Player Dashboard</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtext">Cyberpunk Neon Enhanced — 업로드하거나 탐색 ⚡</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtext">Cyberpunk Neon Ultimate — Upload & Explore ⚡</div>', unsafe_allow_html=True)
 
 # --- 탭 ---
 tabs = st.tabs(["🏠 Overview", "📊 Visuals", "🔍 Analysis", "📥 Download"])
@@ -108,7 +123,8 @@ with tabs[1]:
     if selected_numeric:
         col = st.selectbox("히스토그램 컬럼 선택", selected_numeric)
         fig = px.histogram(df, x=col, nbins=40, color_discrete_sequence=['#00FFFF'])
-        fig.update_layout(template='plotly_dark', title=f"{col} 분포")
+        fig.update_layout(template='plotly_dark', title=f"{col} 분포",
+                          plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
         st.plotly_chart(fig, use_container_width=True)
 
     if len(selected_numeric) > 1:
@@ -117,9 +133,10 @@ with tabs[1]:
         color = st.selectbox("색상 기준", [None] + cat_cols)
         fig2 = px.scatter(df, x=xcol, y=ycol, color=color,
                           hover_data=df.columns,
-                          color_discrete_sequence=['#00FFFF','#FF00FF','#00FFAA'])
-        fig2.update_traces(marker=dict(size=12, line=dict(width=1, color='#ffffff')))
-        fig2.update_layout(template='plotly_dark', title=f"{ycol} vs {xcol}")
+                          color_discrete_sequence=['#00FFFF','#FF00FF','#FF0077'])
+        fig2.update_traces(marker=dict(size=14, line=dict(width=2, color='#ffffff')))
+        fig2.update_layout(template='plotly_dark', title=f"{ycol} vs {xcol}",
+                           plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
         st.plotly_chart(fig2, use_container_width=True)
 
 # --- Analysis 탭 ---
@@ -127,8 +144,9 @@ with tabs[2]:
     st.markdown("### 🔬 상관계수 & PCA")
     if len(selected_numeric) >= 3:
         corr = df[selected_numeric].fillna(df[selected_numeric].mean()).corr()
-        fig3 = go.Figure(data=go.Heatmap(z=corr.values, x=corr.columns, y=corr.columns, colorscale='Magma'))
-        fig3.update_layout(title='상관계수 히트맵', template='plotly_dark')
+        fig3 = go.Figure(data=go.Heatmap(z=corr.values, x=corr.columns, y=corr.columns, colorscale='Plasma'))
+        fig3.update_layout(title='상관계수 히트맵', template='plotly_dark',
+                           plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
         st.plotly_chart(fig3, use_container_width=True)
 
         st.markdown("#### 🌀 PCA 2차원 투영")
@@ -141,9 +159,10 @@ with tabs[2]:
             proj_df[selected_cat] = df[selected_cat].dropna().reset_index(drop=True)
         fig4 = px.scatter(proj_df, x='PC1', y='PC2', color=selected_cat,
                           hover_data=proj_df.columns,
-                          color_discrete_sequence=['#00FFFF','#FF00FF','#00FFAA'])
-        fig4.update_traces(marker=dict(size=12, line=dict(width=1, color='#ffffff')))
-        fig4.update_layout(template='plotly_dark', title='PCA 투영')
+                          color_discrete_sequence=['#00FFFF','#FF00FF','#FF0077'])
+        fig4.update_traces(marker=dict(size=14, line=dict(width=2, color='#ffffff')))
+        fig4.update_layout(template='plotly_dark', title='PCA 투영',
+                           plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
         st.plotly_chart(fig4, use_container_width=True)
 
 # --- Download 탭 ---
@@ -155,4 +174,4 @@ with tabs[3]:
     st.download_button("💾 CSV 다운로드", data=csv, file_name='valve_player_data.csv', mime='text/csv')
 
 # --- Footer ---
-st.markdown('<div class="footer">Made with 💜 Streamlit + Plotly | Cyberpunk Neon Enhanced | 2025</div>', unsafe_allow_html=True)
+st.markdown('<div class="footer">Made with 💜 Streamlit + Plotly | Cyberpunk Neon Ultimate | 2025</div>', unsafe_allow_html=True)
