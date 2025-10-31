@@ -1,4 +1,4 @@
-# streamlit_valve_player_app.py — Cyberpunk Neon Edition
+# streamlit_valve_player_app.py — Cyberpunk Neon Edition (with Upload Support)
 
 import streamlit as st
 import pandas as pd
@@ -67,19 +67,33 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# --- Data Loading ---
-@st.cache_data
-def load_data():
-    return pd.read_csv('/mnt/data/Valve_Player_Data.csv')
+# --- File Upload or Default Load ---
+uploaded_file = st.sidebar.file_uploader("📁 Upload your Valve_Player_Data.csv", type=["csv"])
 
-df = load_data()
+@st.cache_data
+def load_default_data():
+    try:
+        return pd.read_csv('Valve_Player_Data.csv')
+    except FileNotFoundError:
+        return None
+
+if uploaded_file is not None:
+    df = pd.read_csv(uploaded_file)
+    st.sidebar.success("✅ Using uploaded CSV file.")
+else:
+    df = load_default_data()
+    if df is None:
+        st.error("⚠️ No data found. Please upload a CSV file in the sidebar.")
+        st.stop()
+    else:
+        st.sidebar.info("📂 Using local 'Valve_Player_Data.csv' file.")
 
 numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
 cat_cols = df.select_dtypes(include=['object']).columns.tolist()
 
 # --- Header ---
 st.markdown('<div class="main-title">🎮 Valve Player Dashboard</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtext">Cyberpunk Neon Edition — Dive into your player stats like never before ⚡</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtext">Cyberpunk Neon Edition — Upload your data or explore defaults ⚡</div>', unsafe_allow_html=True)
 
 # --- Tabs ---
 tabs = st.tabs(["🏠 Overview", "📊 Visuals", "🔍 Analysis", "📥 Download"])
@@ -159,4 +173,4 @@ with tabs[3]:
     )
 
 # --- Footer ---
-st.markdown('<div class="footer">Made with 💜 Streamlit + Plotly | Cyberpunk Neon Theme | 2025</div>', unsafe_allow_html=True)
+st.markdown('<div class="footer">Made with 💜 Streamlit + Plotly | Cyberpunk Neon Theme | Upload Ready | 2025</div>', unsafe_allow_html=True)
