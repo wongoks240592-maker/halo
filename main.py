@@ -1,4 +1,4 @@
-# streamlit_steam_dashboard_inline.py
+# streamlit_valve_dashboard_inline.py
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -7,9 +7,9 @@ import plotly.graph_objects as go
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
-st.set_page_config(page_title="Steam Player Dashboard", page_icon="🎮", layout="wide")
+st.set_page_config(page_title="Valve Player Dashboard", page_icon="🎮", layout="wide")
 
-# --- Cyberpunk Neon CSS 강화 ---
+# --- Cyberpunk Neon CSS ---
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
@@ -68,14 +68,12 @@ html, body, [class*="st-"] {
 </style>
 """, unsafe_allow_html=True)
 
-# --- 샘플 데이터 내장 ---
-df = pd.DataFrame({
-    "player_id": [f"P{i:03d}" for i in range(1,21)],
-    "score": np.random.randint(100,1000,20),
-    "hours_played": np.random.randint(5,100,20),
-    "level": np.random.randint(1,50,20),
-    "region": np.random.choice(["NA","EU","ASIA"],20)
-})
+# --- CSV 바로 불러오기 ---
+@st.cache_data
+def load_data():
+    return pd.read_csv("Valve_Player_Data.csv")  # CSV 파일을 프로젝트 폴더에 넣어야 함
+
+df = load_data()
 
 numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
 cat_cols = df.select_dtypes(include=['object']).columns.tolist()
@@ -86,8 +84,8 @@ selected_numeric = st.sidebar.multiselect("분석할 숫자형 컬럼 선택", n
 selected_cat = st.sidebar.selectbox("PCA 색상 기준 범주형 컬럼 선택", [None] + cat_cols)
 
 # --- 헤더 ---
-st.markdown('<div class="main-title">🎮 Steam Player Dashboard</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtext">Cyberpunk Neon Ultimate — 바로 탐색 ⚡</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">🎮 Valve Player Dashboard</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtext">Cyberpunk Neon — CSV 바로 표시 및 분석 ⚡</div>', unsafe_allow_html=True)
 
 # --- 탭 ---
 tabs = st.tabs(["🏠 Overview", "📊 Visuals", "🔍 Analysis", "📥 Download"])
@@ -103,7 +101,10 @@ with tabs[0]:
 
     st.markdown("---")
     st.markdown("#### 🏆 상위 10 플레이어 (score 기준)")
-    st.dataframe(df.sort_values('score', ascending=False).head(10))
+    if 'score' in df.columns:
+        st.dataframe(df.sort_values('score', ascending=False).head(10))
+    else:
+        st.dataframe(df.head(10))
 
 # --- Visuals 탭 ---
 with tabs[1]:
@@ -160,10 +161,8 @@ with tabs[3]:
     def convert_df_to_csv(d): 
         return d.to_csv(index=False).encode('utf-8')
     csv = convert_df_to_csv(df)
-    st.download_button("💾 CSV 다운로드", data=csv, file_name='steam_player_data.csv', mime='text/csv')
+    st.download_button("💾 CSV 다운로드", data=csv, file_name='valve_player_data.csv', mime='text/csv')
 
 # --- Footer ---
-st.markdown('<div class="footer">Made with 💜 Streamlit + Plotly | Cyberpunk Neon Ultimate | 2025</div>', unsafe_allow_html=True)
+st.markdown('<div class="footer">Made with 💜 Streamlit + Plotly | Cyberpunk Neon | 2025</div>', unsafe_allow_html=True)
 
-# --- Footer ---
-st.markdown('<div class="footer">Made with 💜 Streamlit + Plotly | Cyberpunk Neon Ultimate | 2025</div>', unsafe_allow_html=True)
